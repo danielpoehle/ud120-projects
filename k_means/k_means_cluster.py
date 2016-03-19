@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append("../tools/")
 from feature_format import featureFormat, targetFeatureSplit
-
+from sklearn.preprocessing import MinMaxScaler
 
 
 
@@ -48,11 +48,14 @@ data_dict.pop("TOTAL", 0)
 ### can be any key in the person-level dictionary (salary, director_fees, etc.) 
 feature_1 = "salary"
 feature_2 = "exercised_stock_options"
+# feature_3 = "total_payments"
 poi  = "poi"
 features_list = [poi, feature_1, feature_2]
 data = featureFormat(data_dict, features_list )
 poi, finance_features = targetFeatureSplit( data )
 
+scaler = MinMaxScaler()
+finance_features = scaler.fit_transform(finance_features)
 
 ### in the "clustering with 3 features" part of the mini-project,
 ### you'll want to change this line to 
@@ -65,12 +68,32 @@ plt.show()
 ### cluster here; create predictions of the cluster labels
 ### for the data and store them to a list called pred
 
-
-
+from sklearn.cluster import KMeans
+clu = KMeans(n_clusters=2, n_init=100, init='random')
+clu.fit(data)
+pred = clu.predict(data)
 
 ### rename the "name" parameter when you change the number of features
 ### so that the figure gets saved to a different file
 try:
-    Draw(pred, finance_features, poi, mark_poi=False, name="clusters.pdf", f1_name=feature_1, f2_name=feature_2)
+    Draw(pred, finance_features, poi, mark_poi=False, name="clusters-scale.pdf", f1_name=feature_1, f2_name=feature_2)
 except NameError:
     print "no predictions object named pred found, no clusters to plot"
+
+ex = []
+sal = []
+
+for name in data_dict:
+    ex.append(data_dict[name]["exercised_stock_options"])
+    sal.append(data_dict[name]["salary"])
+
+ex = [x for x in ex if str(x) != 'NaN']
+sal = [x for x in sal if str(x) != 'NaN']
+
+print "Max exercised_stock_options: ", max(ex)
+print "Min exercised_stock_options: ", min(ex)
+print "$1 Million scaled: ", (1000000.0 - min(ex))/(max(ex) - min(ex))
+
+print "Max salary: ", max(sal)
+print "Min salary: ", min(sal)
+print "$200000 scaled: ", (200000.0 - min(sal))/(max(sal) - min(sal))

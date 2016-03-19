@@ -13,6 +13,11 @@
 
 import pickle
 import sys
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+from sklearn import cross_validation
+from sklearn import grid_search
+
 sys.path.append("../tools/")
 from feature_format import featureFormat, targetFeatureSplit
 
@@ -27,5 +32,26 @@ labels, features = targetFeatureSplit(data)
 
 
 ### your code goes here 
+
+feat_train, feat_test, lab_train, lab_test = cross_validation.train_test_split(features, labels, test_size = 0.3, random_state = 42)
+
+ctr = 0
+for tst in lab_test:
+    if tst == 1:
+        ctr += 1
+
+print "Number of POIs in the test set: ", ctr
+
+clf = DecisionTreeClassifier()
+clf.fit(feat_train, lab_train)
+
+pred = clf.predict(feat_test)
+
+print "Accuracy: ", accuracy_score(pred, lab_test)
+print "Precision: ", precision_score(pred, lab_test)
+print "Recall : ", recall_score(pred, lab_test)
+
+
+
 
 

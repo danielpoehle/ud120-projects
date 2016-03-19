@@ -12,6 +12,12 @@
 
 import pickle
 import sys
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+from sklearn import cross_validation
+from sklearn import grid_search
+
+
 sys.path.append("../tools/")
 from feature_format import featureFormat, targetFeatureSplit
 
@@ -25,8 +31,22 @@ features_list = ["poi", "salary"]
 data = featureFormat(data_dict, features_list)
 labels, features = targetFeatureSplit(data)
 
+feat_train, feat_test, lab_train, lab_test = cross_validation.train_test_split(features, labels, test_size = 0.3, random_state = 42)
+
 
 
 ### it's all yours from here forward!  
+
+parameters = {"splitter": ("best", "random"),
+              "max_depth":  [2,3,4,5,10,100,1000, None],
+              "min_samples_split": [2,5,10]}
+
+tr = DecisionTreeClassifier()
+clf = grid_search.GridSearchCV(tr, parameters)
+clf.fit(feat_train, lab_train)
+
+pred = clf.predict(feat_test)
+print accuracy_score(pred, lab_test)
+print clf.best_estimator_
 
 

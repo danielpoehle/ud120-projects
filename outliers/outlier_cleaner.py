@@ -14,7 +14,16 @@ def outlierCleaner(predictions, ages, net_worths):
     cleaned_data = []
 
     ### your code goes here
+    npoints = len(net_worths)
+    max_ind = int(0.9 * npoints)
+    
+    for i in range(npoints):
+        cleaned_data.append((ages[i][0], net_worths[i][0], abs(net_worths[i][0] - predictions[i][0])))
 
+    cleaned_data = sorted(cleaned_data, key=lambda tup: tup[2])
+    cleaned_data = cleaned_data[:max_ind]
+    
+    
     
     return cleaned_data
 

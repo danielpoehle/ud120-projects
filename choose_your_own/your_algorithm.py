@@ -3,6 +3,10 @@
 import matplotlib.pyplot as plt
 from prep_terrain_data import makeTerrainData
 from class_vis import prettyPicture
+from time import time
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
 
 features_train, labels_train, features_test, labels_test = makeTerrainData()
 
@@ -31,7 +35,17 @@ plt.show()
 ### your code here!  name your classifier object clf if you want the 
 ### visualization code (prettyPicture) to show you the decision boundary
 
+clf = RandomForestClassifier(n_estimators = 10000, n_jobs = 3, max_depth = 5, min_samples_split = 5)
 
+t0 = time()
+clf.fit(features_train, labels_train)
+print "training time:", round(time()-t0, 3), "s"
+
+t1 = time()
+pred = clf.predict(features_test)
+print "predicting time:", round(time()-t1, 3), "s"
+
+print accuracy_score(pred, labels_test)
 
 
 
